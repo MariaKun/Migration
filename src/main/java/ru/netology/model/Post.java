@@ -3,6 +3,15 @@ package ru.netology.model;
 public class Post {
     private long id;
     private String content;
+    private boolean isRemoved = false;
+
+    public boolean isRemoved() {
+        return isRemoved;
+    }
+
+    public void setRemoved(boolean removed) {
+        isRemoved = removed;
+    }
 
     public Post() {
     }
