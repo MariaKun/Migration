@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.stream.Collectors;
 
 @Repository
 // Stub
@@ -19,28 +20,39 @@ public class PostRepository {
     private ConcurrentHashMap<Long, Post> hashMap = new ConcurrentHashMap<>();
 
     public List<Post> all() {
-        return new ArrayList<>(hashMap.values());
+        return hashMap.values().stream()
+                .filter(post -> !post.isRemoved())
+                .collect(Collectors.toList());
     }
 
     public Optional<Post> getById(long id) {
-        return Optional.ofNullable(hashMap.get(id));
+        if (hashMap.containsKey(id))
+        {
+            var post = hashMap.get(id);
+            if (!post.isRemoved())
+            {
+                return Optional.of(post);
+            }
+        }
+        return Optional.empty();
     }
 
     public Post save(Post post) {
-        if (post.getId() == 0) {
+        var id = post.getId();
+        if (id == 0) {
             var newId = globalId.getAndIncrement();
             post.setId(newId);
             hashMap.put(newId, post);
         }
-        if (hashMap.containsKey(post.getId())) {
+        if (hashMap.containsKey(id) && !hashMap.get(id).isRemoved()) {
             hashMap.put(post.getId(), post);
         } else throw new NotFoundException("Id " + post.getId() + " was not found");
         return post;
     }
 
     public void removeById(long id) {
-        if (hashMap.remove(id) == null)
+        if (hashMap.get(id) == null)
             throw new NotFoundException("Id " + id + " was not found");
-        ;
+        else hashMap.get(id).setRemoved(true);
     }
 }
