@@ -8,6 +8,7 @@ import ru.netology.service.PostService;
 
 import java.io.IOException;
 import java.io.Reader;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/posts")
@@ -20,8 +21,8 @@ public class PostController {
     }
 
     @GetMapping
-    public void all() {
-        final var data = service.all();
+    public List<Post> all() {
+        return service.all();
     }
 
     @GetMapping("/{id}")
